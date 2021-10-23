@@ -1,0 +1,82 @@
+# This yaml file is created to connect with panorama and configure the passowrd.
+
+---
+- name: Panorama Configuration
+  hosts: localhost
+  gather_facts: no
+  tasks:
+
+# chekcing the argument recevied [password] while running this template.
+   - name: checking the password being recevied.
+     debug:
+      msg: "{{randompassword}}"
+
+# establishing API connectivity and extract the API key from panorama.
+   - name: connecting with panorama
+     uri:
+      method: GET
+      url: https://mgomtpanp1/api/?type=keygen&user=apiadmin&password=Iop@Xcv!Iop@123
+      return_content: yes
+      body_format: json
+      headers:
+          Content-type: application/json
+     register: result
+
+# this is to debug the result as we need key only.
+   - name: debug
+     debug:
+      msg: "{{result.content | regex_findall ('<key>(.*)</key>')}}"
+
+# setting variable with key value.
+   - set_fact:
+       rslt: "{{result.content | regex_findall ('<key>(.*)</key>')}}"
+
+# generating the hash value using passowrd & key.
+   - name: getting the info of firewall
+     uri:
+      method: GET
+      url: https://mgomtpanp1//api/?type=op&key={{rslt[0]}}&cmd=<request><password-hash><password>{{randompassword}}</password><templatename>Lab-Admin</templatename></password-hash></request>
+      return_content: yes
+      body_format: json
+      headers:
+          Content-type: application/json
+     register: result2
+
+   - name: debug
+     debug:
+      msg: "{{result2.content | regex_findall ('<phash>(.*)</phash>')}}"
+
+# setting variable with hash value.
+   - set_fact:
+       rslt1: "{{result2.content | regex_findall ('<phash>(.*)</phash>')}}"
+
+# setting hash password in panorama template.
+   - name: getting the info of firewall
+     uri:
+      method: POST
+      url: https://mgomtpanp1/api/?type=config&action=set&key={{rslt[0]}}&xpath=/config/devices/entry[@name='localhost.localdomain']/template/entry[@name='Lab-Admin']/config/mgt-config/users/entry[@name='testadmin']&element=<phash>{{rslt1[0]}}</phash>
+      return_content: yes
+      body_format: json
+      headers:
+          Content-type: application/json
+     register: status_result
+
+# this is to debug the result as to know the status.
+   - name: debug
+     debug:
+      msg: "{{result1}}"
+
+# generating the hash value using passowrd & key.
+   - name: getting the info of firewall
+     uri:
+      method: GET
+      url: https://mgomtpanp1/api/?type=commit&action=all&cmd=<commit-all><template><name>Lab-Admin</name></template></commit-all>
+      return_content: yes
+      body_format: json
+      headers:
+          Content-type: application/json
+     register: result2
+
+   - name: debug
+     debug:
+      msg: "{{result2.content | regex_findall ('<phash>(.*)</phash>')}}"
