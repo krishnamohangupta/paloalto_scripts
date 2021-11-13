@@ -15,7 +15,7 @@
    - name: connecting with panorama
      uri:
       method: GET
-      url: https://mgomtpanp1/api/?type=keygen&user=apiadmin&password=Iop@Xcv!Iop@123
+      url: https://{{fw}}/api/?type=keygen&user={{api_user}}&password={{pass}}
       return_content: yes
       body_format: json
       headers:
@@ -35,7 +35,7 @@
    - name: getting the info of firewall
      uri:
       method: GET
-      url: https://mgomtpanp1//api/?type=op&key={{rslt[0]}}&cmd=<request><password-hash><password>{{randompassword}}</password><templatename>Lab-Admin</templatename></password-hash></request>
+      url: https://{{fw}}//api/?type=op&key={{rslt[0]}}&cmd=<request><password-hash><password>{{randompassword}}</password><templatename>Lab-Admin</templatename></password-hash></request>
       return_content: yes
       body_format: json
       headers:
@@ -54,7 +54,7 @@
    - name: getting the info of firewall
      uri:
       method: POST
-      url: https://mgomtpanp1/api/?type=config&action=set&key={{rslt[0]}}&xpath=/config/devices/entry[@name='localhost.localdomain']/template/entry[@name='Lab-Admin']/config/mgt-config/users/entry[@name='testadmin']&element=<phash>{{rslt1[0]}}</phash>
+      url: https://{{fw}}/api/?type=config&action=set&key={{rslt[0]}}&xpath=/config/devices/entry[@name='localhost.localdomain']/template/entry[@name='Lab-Admin']/config/mgt-config/users/entry[@name='testadmin']&element=<phash>{{rslt1[0]}}</phash>
       return_content: yes
       body_format: json
       headers:
@@ -70,7 +70,7 @@
    - name: getting the info of firewall
      uri:
       method: GET
-      url: https://mgomtpanp1/api/?type=commit&action=all&cmd=<commit-all><template><name>Lab-Admin</name></template></commit-all>
+      url: https://{{fw}}/api/?type=commit&action=all&cmd=<commit-all><template><name>Lab-Admin</name></template></commit-all>
       return_content: yes
       body_format: json
       headers:
